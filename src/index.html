@@ -12,6 +12,7 @@
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
     uniform mat4 uNormalMatrix;
+    uniform mat4 uScaleMatrix;
     uniform vec3 uLightDirection;
     uniform vec3 uLightDiffuse;
     uniform vec3 uMaterialDiffuse;
@@ -27,7 +28,7 @@
       float lambertTerm = dot(N, -L);
       vec3 Id = uMaterialDiffuse * uLightDiffuse * lambertTerm;
       vVertexColor = vec4(Id, 1.0);
-      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+      gl_Position = uScaleMatrix * uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
     }
 
   </script>

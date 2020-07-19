@@ -49,6 +49,7 @@
       // Set locations onto the `program` instance
       program.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
       program.aVertexNormal = gl.getAttribLocation(program, 'aVertexNormal');
+      program.uScaleMatrix = gl.getUniformLocation(program, 'uScaleMatrix')
       program.uProjectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
       program.uModelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
       program.uNormalMatrix = gl.getUniformLocation(program, 'uNormalMatrix');
@@ -61,7 +62,7 @@
 
       // Configure `camera` and set it to be in tracking mode
       camera = new Camera();
-      camera.goHome([0, 2, 30]);
+      camera.goHome([0, 2, 20]);
 
       // Configure controls by allowing user driven events to move camera around
       new Controls(camera, canvas);
@@ -78,14 +79,16 @@
     function setMatrixUniforms() {
       gl.uniformMatrix4fv(program.uModelViewMatrix, false, camera.getViewTransform());
       gl.uniformMatrix4fv(program.uProjectionMatrix, false, projectionMatrix);
+      gl.uniformMatrix4fv(program.uScaleMatrix, false, mat4.create());
       mat4.transpose(normalMatrix, camera.matrix);
       gl.uniformMatrix4fv(program.uNormalMatrix, false, normalMatrix);
     }
 
     function initBuffers() {
       scene.add(cube(), {alias:'cube', transform: [2, 0, 2]})
-      scene.add(cube(), {alias:'cube', transform: [0, 0, 0]})
-      scene.add(cube(), {alias:'cube', transform: [-2, 0, -2]})
+      scene.add(cube([0.5, 0.5, 0.5]), {alias:'cube', transform: [0, 0, 0]})
+      scene.add(cube([1,0,0]), {alias:'cube', transform: [-2, 0, -2]})
+      scene.add(plane([0,0,1]), {alias:'plane', transform: [0, -0.5, 0], scale: [20, 1, 20]})
     }
 
     function draw() {
@@ -105,11 +108,20 @@
           transforms.calculateModelView();
           transforms.push();
 
-          if (object.alias === 'cube') {
-            const sphereTransform = transforms.modelViewMatrix;
+          if (object.transform) {
+            const objTransform = transforms.modelViewMatrix;
             const loc = [...object.transform]
-            loc[2] += pos
-            mat4.translate(sphereTransform, sphereTransform, loc);
+            if (object.alias === 'cube') loc[2] += pos
+            mat4.translate(objTransform, objTransform, loc);
+          }
+
+          if (object.scale) {
+            const objTransform = transforms.modelViewMatrix;
+            const scale = [...object.scale]
+            scale[0] -= 7 - Math.abs(pos)
+            scale[2] -= 7 - Math.abs(pos)
+            console.log(scale)
+            mat4.scale(objTransform, objTransform, scale)
           }
 
           transforms.setMatrixUniforms();
@@ -148,7 +160,7 @@
     function animate() {
       pos += dx;
 
-      if (pos >= 10 || pos <= -10) {
+      if (pos >= 7 || pos <= -7) {
         dx = -dx;
       }
       draw();

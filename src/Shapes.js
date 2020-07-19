@@ -28,3 +28,17 @@ const cube = (colour) => ({
     ],
     diffuse: colour || [0.5, 0.9, 0.1],
 })
+
+const plane = (colour) => ({
+    vertices: [
+        -0.5, 0, 0.5,
+        0.5, 0, 0.5,
+        0.5, 0, -0.5,
+        -0.5, 0, -0.5,
+    ],
+    indices: [
+        3, 2, 0,
+        2, 1, 0,
+    ],
+    diffuse: colour || [0.5, 0.9, 0.1],
+})
